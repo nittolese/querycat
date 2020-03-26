@@ -1,3 +1,5 @@
+import multiprocessing
+from tqdm import tqdm
 import torch
 import pandas as pd
 from torch import nn
@@ -16,7 +18,8 @@ class BERTSim:
         
         random.seed(random_seed)
         np.random.seed(random_seed)
-        torch.manual_seed(random_seed)        
+        torch.manual_seed(random_seed)
+        torch.set_num_threads(multiprocessing.cpu_count())
 
         self.random_seed = random_seed
         self.model = AutoModelWithLMHead.from_pretrained(transformer_model)
@@ -35,7 +38,7 @@ class BERTSim:
 
 
     def add_terms(self, texts):
-        for t in texts:
+        for t in tqdm(texts):
             if t not in self.terms:
                 emb   = self.get_embedding(t)
                 self.terms.append(t)
