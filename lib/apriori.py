@@ -4,6 +4,7 @@
 a simple implementation of Apriori algorithm by Python.
 """
 
+from tqdm import tqdm
 import sys
 import csv
 import argparse
@@ -285,7 +286,7 @@ def apriori(transactions, **kwargs):
         transaction_manager, min_support, max_length=max_length)
 
     # Calculate ordered stats.
-    for support_record in support_records:
+    for support_record in tqdm(support_records):
         ordered_statistics = list(
             _filter_ordered_statistics(
                 _gen_ordered_statistics(transaction_manager, support_record),
