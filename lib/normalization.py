@@ -170,7 +170,7 @@ def normalize_corpus(corpus, lemmatize=True,
 
     normalized_corpus = []
     
-    for text in corpus:
+    for text in tqdm(corpus):
         text = html_parser.unescape(text)
         text = expand_contractions(text, CONTRACTION_MAP)
         if lemmatize:
