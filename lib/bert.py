@@ -26,7 +26,7 @@ class BERTSim:
         self.model = AutoModel.from_pretrained(transformer_model)
         self.tokenizer = AutoTokenizer.from_pretrained(transformer_model)
         self.terms          = []
-        self.embeddings     = torch.FloatTensor([])
+        self.embeddings     = []
         self.embeddings_2d  = None
         self.diffs          = []
         self.embed          = None        
@@ -43,7 +43,9 @@ class BERTSim:
             if t not in self.terms:
                 emb   = self.get_embedding(t, method=method)
                 self.terms.append(t)
-                self.embeddings = torch.cat((self.embeddings, emb), dim=0)
+                self.embeddings.append(emb)
+        
+        self.embeddings = torch.cat(self.embeddings, dim=0)
 
 
     def get_embedding(self, text, method="sum"):
