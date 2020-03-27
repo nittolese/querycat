@@ -22,7 +22,8 @@ class BERTSim:
         torch.set_num_threads(multiprocessing.cpu_count())
 
         self.random_seed = random_seed
-        self.model = AutoModelWithLMHead.from_pretrained(transformer_model)
+        # self.model = AutoModelWithLMHead.from_pretrained(transformer_model)
+        self.model = AutoModel.from_pretrained(transformer_model)
         self.tokenizer = AutoTokenizer.from_pretrained(transformer_model)
         self.terms          = []
         self.embeddings     = torch.FloatTensor([])
@@ -37,22 +38,25 @@ class BERTSim:
         self.diffs = df[diff_col].tolist()
 
 
-    def add_terms(self, texts):
+    def add_terms(self, texts, method="sum"):
         for t in tqdm(texts):
             if t not in self.terms:
-                emb   = self.get_embedding(t)
+                emb   = self.get_embedding(t, method=method)
                 self.terms.append(t)
                 self.embeddings = torch.cat((self.embeddings, emb), dim=0)
 
 
-    def get_embedding(self, text):
+    def get_embedding(self, text, method="sum"):
         with torch.no_grad():
             input_ids = torch.LongTensor(self.tokenizer.encode(text, add_special_tokens=False)).unsqueeze(0)
             outputs = self.model(input_ids)
             lh = outputs[0]
             if self.embed is not None:
                 lh = self.embed(lh)
-            emb = torch.sum(lh, dim=1)
+            if method== "sum":
+                emb = torch.sum(lh, dim=1)
+            elif method== "mean":
+                emb = torch.mean(lh, dim=1)
 
         return emb
 
